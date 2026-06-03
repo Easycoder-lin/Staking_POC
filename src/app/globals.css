@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: #f7f8f4;
+  color: #17202a;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+.react-flow__attribution {
+  display: none;
+}
