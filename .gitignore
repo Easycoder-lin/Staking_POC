@@ -4,3 +4,5 @@ cache
 .codex
 .agents
 .env
+.env.local
+.mock-staking

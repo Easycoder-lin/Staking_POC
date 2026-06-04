@@ -23,6 +23,12 @@ foundryup
 forge test -vvv
 ```
 
+## Run Mock Provider Tests
+
+```sh
+npm run test:mock-provider
+```
+
 ## Run Local Anvil
 
 In one terminal:
@@ -70,6 +76,17 @@ NEXT_PUBLIC_ENABLE_REAL_STAKING=false
 ```
 
 `FIGMENT_API_KEY` is read only by backend API routes. Phase B1 requests validator data and previews the deposit transaction only. It does not send 32 Hoodi ETH.
+
+For Route B mock provider mode, add optional demo configuration:
+
+```sh
+MOCK_STAKING_ENABLED=true
+DEFAULT_STAKING_PROVIDER=mock
+DEFAULT_STAKING_NETWORK=hoodi
+MOCK_STAKING_STORE_PATH=.mock-staking/validators.json
+```
+
+The mock provider persists demo validators locally and never creates a real Ethereum validator. See `docs/staking-mock-provider.md` for API routes and the full lifecycle demo.
 
 ## Run The Frontend
 

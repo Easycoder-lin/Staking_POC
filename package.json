@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "test:mock-provider": "node --test test/mock-provider/lifecycle.test.mjs",
     "start": "next start",
     "lint": "eslint . --max-warnings=0"
   },

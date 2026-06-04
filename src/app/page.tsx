@@ -9,6 +9,7 @@ import { FigmentConnectionStatus } from "@/components/FigmentConnectionStatus";
 import { FigmentDepositPreview, type DepositPreview } from "@/components/FigmentDepositPreview";
 import { FigmentValidatorRequest } from "@/components/FigmentValidatorRequest";
 import { FigmentValidatorStatus } from "@/components/FigmentValidatorStatus";
+import { MockProviderDemo } from "@/components/MockProviderDemo";
 import { StakePanel } from "@/components/StakePanel";
 import { ValidatorDetails } from "@/components/ValidatorDetails";
 import { ValidatorFlow } from "@/components/ValidatorFlow";
@@ -27,7 +28,7 @@ import { SlashReason, type TimelineItem, type Validator } from "@/lib/types";
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const RECENT_IDS_KEY = "mock-staking-recent-validator-ids";
 const TIMELINE_KEY = "mock-staking-timeline";
-type AppMode = "simulator" | "figment";
+type AppMode = "mock-provider" | "simulator" | "figment";
 
 type FigmentHealth = {
   ok?: boolean;
@@ -64,7 +65,7 @@ export default function Home() {
   const [success, setSuccess] = useState<string>();
   const [timeline, setTimeline] = useState<TimelineItem[]>([]);
   const [recentValidatorIds, setRecentValidatorIds] = useState<string[]>([]);
-  const [mode, setMode] = useState<AppMode>("simulator");
+  const [mode, setMode] = useState<AppMode>("mock-provider");
   const [numberOfValidators, setNumberOfValidators] = useState(1);
   const [figmentHealth, setFigmentHealth] = useState<FigmentHealth>();
   const [figmentResult, setFigmentResult] = useState<FigmentRequestResponse>();
@@ -433,9 +434,20 @@ export default function Home() {
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 className="text-base font-semibold">Mode</h2>
-                <p className="mt-1 text-sm text-ink/70">Switch between the local simulator and Figment Direct Mode.</p>
+                <p className="mt-1 text-sm text-ink/70">
+                  Switch between the API-backed mock provider, local contract simulator, and Figment Direct Mode.
+                </p>
               </div>
-              <div className="grid grid-cols-2 gap-2 rounded-md border border-line bg-paper p-1">
+              <div className="grid grid-cols-1 gap-2 rounded-md border border-line bg-paper p-1 sm:grid-cols-3">
+                <button
+                  type="button"
+                  onClick={() => setMode("mock-provider")}
+                  className={`rounded px-4 py-2 text-sm font-semibold ${
+                    mode === "mock-provider" ? "bg-ink text-white" : "text-ink hover:bg-white"
+                  }`}
+                >
+                  Mock Provider Mode
+                </button>
                 <button
                   type="button"
                   onClick={() => setMode("simulator")}
@@ -460,7 +472,9 @@ export default function Home() {
 
           <WalletStatus />
 
-          {mode === "figment" ? (
+          {mode === "mock-provider" ? (
+            <MockProviderDemo />
+          ) : mode === "figment" ? (
             <div className="space-y-5">
               <div className="rounded-lg border border-rose/25 bg-rose/10 p-4 text-sm font-semibold text-rose">
                 No deposit will be sent in Phase B1.
