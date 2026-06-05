@@ -20,6 +20,42 @@ function nextStatus(status) {
   return lifecycle[index + 1];
 }
 
+function stake(account, amount = 32) {
+  return {
+    ...account,
+    walletBalance: account.walletBalance - amount,
+    stakedBalance: account.stakedBalance + amount
+  };
+}
+
+function reward(account, amount = 0.2) {
+  return {
+    ...account,
+    rewards: account.rewards + amount,
+    finalWithdrawableBalance: account.stakedBalance + account.pendingWithdrawal + account.rewards + amount
+  };
+}
+
+function exit(account) {
+  return {
+    ...account,
+    stakedBalance: 0,
+    pendingWithdrawal: account.pendingWithdrawal + account.stakedBalance + account.rewards,
+    finalWithdrawableBalance: account.stakedBalance + account.pendingWithdrawal + account.rewards
+  };
+}
+
+function withdraw(account) {
+  const withdrawable = account.pendingWithdrawal || account.finalWithdrawableBalance;
+  return {
+    ...account,
+    walletBalance: account.walletBalance + withdrawable,
+    pendingWithdrawal: 0,
+    rewards: 0,
+    finalWithdrawableBalance: 0
+  };
+}
+
 test("create mock stake starts in pending_deposit", () => {
   assert.equal(nextStatus("draft"), "pending_deposit");
 });
@@ -45,4 +81,31 @@ test("simulate slashing is terminal for automatic advance", () => {
 
 test("prevent invalid state transitions after withdrawn", () => {
   assert.equal(nextStatus("withdrawn"), undefined);
+});
+
+test("demo balances move through stake reward exit and withdrawal", () => {
+  const initial = {
+    walletBalance: 40,
+    stakedBalance: 0,
+    pendingWithdrawal: 0,
+    rewards: 0,
+    slashedAmount: 0,
+    finalWithdrawableBalance: 0
+  };
+
+  const staked = stake(initial);
+  assert.equal(staked.walletBalance, 8);
+  assert.equal(staked.stakedBalance, 32);
+
+  const rewarded = reward(staked);
+  assert.equal(rewarded.rewards, 0.2);
+  assert.equal(rewarded.finalWithdrawableBalance, 32.2);
+
+  const exiting = exit(rewarded);
+  assert.equal(exiting.stakedBalance, 0);
+  assert.equal(exiting.pendingWithdrawal, 32.2);
+
+  const withdrawn = withdraw(exiting);
+  assert.equal(withdrawn.walletBalance, 40.2);
+  assert.equal(withdrawn.pendingWithdrawal, 0);
 });

@@ -20,6 +20,9 @@
     "viem": "^2.22.17",
     "wagmi": "^2.14.9"
   },
+  "overrides": {
+    "use-sync-external-store": "1.4.0"
+  },
   "devDependencies": {
     "@types/node": "^22.13.4",
     "@types/react": "^19.0.8",
