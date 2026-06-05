@@ -138,7 +138,6 @@ export function MockProviderDemo() {
   }, []);
 
   const mockProvider = useMemo(() => providers.find((provider) => provider.id === "mock"), [providers]);
-  const realProviders = useMemo(() => providers.filter((provider) => provider.id !== "mock"), [providers]);
   const steps = useMemo(() => buildDemoSteps(validator?.status, selectedAccount, selectedAccount.rewards), [
     selectedAccount,
     validator?.status
@@ -360,48 +359,34 @@ export function MockProviderDemo() {
   });
 
   return (
-    <div className="space-y-5">
-      <section className="rounded-lg border border-line bg-white p-4 shadow-panel">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-moss">Demo control room</p>
-            <h2 className="mt-1 text-xl font-bold">Ethereum Staking POC</h2>
-            <p className="mt-1 max-w-3xl text-sm text-ink/70">
-              Select a demo account, execute one staking step at a time, and watch balances move through staking,
-              rewards, exit, waiting period, withdrawal, and optional slashing.
-            </p>
-          </div>
+    <div className="grid gap-4 xl:grid-cols-[260px_1fr]">
+      <aside className="space-y-4">
+        <div className="rounded-lg border border-line bg-white p-3 shadow-panel">
           <button
             type="button"
             onClick={resetDemoState}
-            className="rounded-md border border-line bg-white px-4 py-2.5 text-sm font-semibold text-ink hover:bg-paper"
+            className="w-full rounded-md border border-line bg-paper px-3 py-2 text-sm font-semibold text-ink hover:bg-white"
           >
             Reset Demo State
           </button>
         </div>
-      </section>
-
-      <div className="grid gap-5 xl:grid-cols-[280px_1fr]">
-        <div className="space-y-5">
           <AccountSelector
             accounts={accounts}
             selectedAccountId={selectedAccountId}
             onSelect={selectAccount}
           />
-          <ProviderSelection mockProvider={mockProvider} realProviders={realProviders} />
-        </div>
+      </aside>
 
-        <div className="space-y-5">
+      <div className="space-y-4">
           <StakingProgress steps={steps} />
           <BalanceCards account={selectedAccount} changes={lastChanges} />
 
-          <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
-            <div className="space-y-5">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <div className="space-y-4">
               <CurrentStepCard action={currentAction} pendingAction={pendingAction} error={error} success={success} />
-              <ActivityLog items={activity} />
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-4">
               <TechnicalDetails
                 walletAddress={walletAddress}
                 withdrawalAddress={withdrawalAddress}
@@ -423,7 +408,8 @@ export function MockProviderDemo() {
               />
             </div>
           </div>
-        </div>
+
+          <ActivityLog items={activity} />
       </div>
     </div>
   );
@@ -439,40 +425,20 @@ function AccountSelector({
   onSelect: (accountId: string) => void;
 }) {
   return (
-    <section className="rounded-lg border border-line bg-white p-4 shadow-panel">
-      <h2 className="text-base font-semibold">Demo Account</h2>
+    <section className="rounded-lg border border-line bg-white p-3 shadow-panel">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-ink/60">Demo Account</h2>
       <div className="mt-3 grid gap-2">
         {accounts.map((account) => (
           <button
             key={account.id}
             type="button"
             onClick={() => onSelect(account.id)}
-            className={`rounded-md border px-3 py-3 text-left text-sm ${
+            className={`rounded-md border px-3 py-3 text-left text-sm transition-colors ${
               selectedAccountId === account.id ? "border-moss bg-moss/10 text-moss" : "border-line bg-paper text-ink"
             }`}
           >
             <span className="block font-semibold">{account.name}</span>
-            <span className="mt-1 block font-mono text-xs text-ink/55">{account.walletAddress}</span>
           </button>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function ProviderSelection({ mockProvider, realProviders }: { mockProvider?: ProviderInfo; realProviders: ProviderInfo[] }) {
-  return (
-    <section className="rounded-lg border border-line bg-white p-4 shadow-panel">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-base font-semibold">Provider</h2>
-        <span className="rounded-full bg-moss/10 px-3 py-1 text-xs font-semibold text-moss">
-          {mockProvider?.name || "Mock Provider"}
-        </span>
-      </div>
-      <div className="mt-4 grid gap-3">
-        <ProviderCard provider={mockProvider} selected />
-        {realProviders.map((provider) => (
-          <ProviderCard key={provider.id} provider={provider} />
         ))}
       </div>
     </section>
@@ -481,27 +447,26 @@ function ProviderSelection({ mockProvider, realProviders }: { mockProvider?: Pro
 
 function StakingProgress({ steps }: { steps: DemoStep[] }) {
   return (
-    <section className="rounded-lg border border-line bg-white p-4 shadow-panel">
+    <section className="rounded-lg border border-line bg-white p-3 shadow-panel">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-base font-semibold">Staking Lifecycle Progress</h2>
-        <span className="text-sm font-medium text-ink/60">
+        <span className="text-xs font-medium text-ink/60">
           {steps.filter((step) => step.status === "completed").length}/{steps.length} complete
         </span>
       </div>
-      <div className="mt-4 overflow-x-auto pb-1">
-        <div className="grid min-w-[860px] grid-cols-9 gap-2">
+      <div className="mt-3 overflow-x-auto pb-1">
+        <div className="grid min-w-[720px] grid-cols-9 gap-1.5">
           {steps.map((step, index) => (
             <div key={step.id} className="relative">
-              {index > 0 ? <span className="absolute -left-2 top-4 h-0.5 w-2 bg-line" /> : null}
+              {index > 0 ? <span className="absolute -left-1.5 top-4 h-0.5 w-1.5 bg-line" /> : null}
               <div
-                className={`min-h-[116px] rounded-md border p-3 text-sm ${stepTone(step.status)}`}
+                className={`min-h-[86px] rounded-md border p-2 text-xs ${stepTone(step.status)}`}
                 title={step.description}
               >
-                <div className="flex h-7 w-7 items-center justify-center rounded-full border bg-white text-xs font-bold">
-                  {step.status === "completed" ? "OK" : index + 1}
+                <div className="flex h-6 w-6 items-center justify-center rounded-full border bg-white text-[11px] font-bold">
+                  {step.status === "completed" ? "✓" : index + 1}
                 </div>
-                <p className="mt-3 font-semibold leading-snug">{step.label}</p>
-                <p className="mt-1 text-xs leading-snug opacity-75">{statusLabel(step.status)}</p>
+                <p className="mt-2 font-semibold leading-snug">{step.label}</p>
               </div>
             </div>
           ))}
@@ -518,33 +483,45 @@ function BalanceCards({
   account: DemoAccount;
   changes: Array<{ field: DemoBalanceField; before: number; after: number; delta: number }>;
 }) {
-  const cards: Array<{ field: DemoBalanceField; value: number }> = [
+  const primaryCards: Array<{ field: DemoBalanceField; value: number }> = [
     { field: "walletBalance", value: account.walletBalance },
     { field: "stakedBalance", value: account.stakedBalance },
-    { field: "rewards", value: account.rewards },
+    { field: "rewards", value: account.rewards }
+  ];
+  const secondaryCards: Array<{ field: DemoBalanceField; value: number }> = [
     { field: "pendingWithdrawal", value: account.pendingWithdrawal },
     { field: "slashedAmount", value: account.slashedAmount },
     { field: "finalWithdrawableBalance", value: account.finalWithdrawableBalance }
   ];
 
   return (
-    <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {cards.map((card) => {
-        const change = changes.find((item) => item.field === card.field);
-        return (
-          <div key={card.field} className="rounded-lg border border-line bg-white p-4 shadow-panel">
-            <p className="text-sm font-medium text-ink/60">{balanceLabels[card.field]}</p>
-            <p className="mt-2 text-2xl font-bold">{formatEth(card.value)}</p>
-            {change ? (
-              <p className={`mt-2 text-sm font-semibold ${change.delta > 0 ? "text-moss" : "text-rose"}`}>
-                {formatEth(change.before)} -&gt; {formatEth(change.after)}
-              </p>
-            ) : (
-              <p className="mt-2 text-sm text-ink/45">No change in latest step</p>
-            )}
+    <section className="rounded-lg border border-line bg-white p-3 shadow-panel">
+      <div className="grid gap-3 md:grid-cols-3">
+        {primaryCards.map((card) => {
+          const change = changes.find((item) => item.field === card.field);
+          return (
+            <div key={card.field} className="rounded-md border border-line bg-paper p-3">
+              <p className="text-sm font-medium text-ink/60">{balanceLabels[card.field]}</p>
+              <p className="mt-2 text-2xl font-bold">{formatEth(card.value)}</p>
+              {change ? (
+                <p className={`mt-2 text-sm font-semibold ${change.delta > 0 ? "text-moss" : "text-rose"}`}>
+                  {formatEth(change.before)} -&gt; {formatEth(change.after)}
+                </p>
+              ) : (
+                <p className="mt-2 text-sm text-ink/45">No change</p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-3 grid gap-2 border-t border-line pt-3 text-sm sm:grid-cols-3">
+        {secondaryCards.map((card) => (
+          <div key={card.field} className="flex items-center justify-between gap-3 rounded-md bg-paper px-3 py-2">
+            <span className="text-ink/60">{balanceLabels[card.field]}</span>
+            <span className="font-semibold">{formatEth(card.value)}</span>
           </div>
-        );
-      })}
+        ))}
+      </div>
     </section>
   );
 }
@@ -601,15 +578,15 @@ function CurrentStepCard({
 
 function ActivityLog({ items }: { items: ActivityItem[] }) {
   return (
-    <section className="rounded-lg border border-line bg-white p-4 shadow-panel">
-      <h2 className="text-base font-semibold">Activity History</h2>
+    <section className="rounded-lg border border-line bg-white p-3 shadow-panel">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-ink/60">Activity History</h2>
       {items.length === 0 ? (
-        <p className="mt-4 rounded-md border border-dashed border-line bg-paper p-4 text-sm text-ink/65">
+        <p className="mt-3 rounded-md border border-dashed border-line bg-paper p-3 text-sm text-ink/65">
           Activity will appear as each demo step runs.
         </p>
       ) : (
-        <div className="mt-4 space-y-3">
-          {items.slice(0, 8).map((item) => (
+        <div className="mt-3 grid gap-2 lg:grid-cols-2">
+          {items.slice(0, 4).map((item) => (
             <div key={item.id} className="rounded-md border border-line bg-paper p-3">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                 <p className="text-sm font-semibold">{item.title}</p>
@@ -729,29 +706,11 @@ function TechnicalDetails({
             </button>
           </div>
         </div>
+        <MockValidatorDetails validator={validator} />
+        <MockTransactionPanel title="Mock Transaction Payload" tx={mockUnsignedTx} />
+        <MockTransactionPanel title="Mock Exit Transaction" tx={mockExitTx} />
       </details>
-
-      <MockValidatorDetails validator={validator} />
-      <MockTransactionPanel title="Mock Transaction Payload" tx={mockUnsignedTx} />
-      <MockTransactionPanel title="Mock Exit Transaction" tx={mockExitTx} />
     </section>
-  );
-}
-
-function ProviderCard({ provider, selected = false }: { provider?: ProviderInfo; selected?: boolean }) {
-  const disabled = provider?.enabled === false;
-  return (
-    <div className={`rounded-lg border p-4 ${selected ? "border-moss bg-moss/10" : "border-line bg-paper"}`}>
-      <div className="flex items-start justify-between gap-2">
-        <h3 className="text-sm font-semibold">{provider?.name || "Mock Provider"}</h3>
-        <span className={`rounded-full px-2 py-1 text-xs font-semibold ${disabled ? "bg-line text-ink/60" : "bg-white text-moss"}`}>
-          {disabled ? "Coming soon" : provider?.realProvider ? "Real" : "Demo"}
-        </span>
-      </div>
-      <p className="mt-2 text-sm text-ink/70">
-        {provider?.description || "Demo-only provider that simulates validator lifecycle data locally."}
-      </p>
-    </div>
   );
 }
 
@@ -1063,13 +1022,6 @@ function stepTone(status: StepStatus) {
   if (status === "current") return "border-sky bg-sky/10 text-sky";
   if (status === "error") return "border-rose bg-rose/10 text-rose";
   return "border-line bg-paper text-ink/45";
-}
-
-function statusLabel(status: StepStatus) {
-  if (status === "completed") return "Completed";
-  if (status === "current") return "Current";
-  if (status === "error") return "Attention";
-  return "Locked";
 }
 
 function statusTone(status: MockValidatorStatus) {
